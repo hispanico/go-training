@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: go-webserver
-          image: hispanico/gowebserver:latest
+          image: cr.gitlab.ninux.org/ingmg/go-training:latest
           resources:
             requests:
               cpu: 100m
@@ -47,3 +47,5 @@ spec:
           ports:
             - containerPort: 8080
               name: go-webserver
+      imagePullSecrets:
+        - name: docker-registry-secret

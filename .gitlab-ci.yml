@@ -19,7 +19,7 @@ Build:
     - /kaniko/executor
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
+      --destination "${CI_REGISTRY_IMAGE}:${$CI_COMMIT_SHA}"
       --destination $CI_REGISTRY_IMAGE:latest
   tags:
    - k8s
@@ -31,21 +31,22 @@ Build:
       when: manual
       allow_failure: true
 
-# Deploy:
-#   stage: Deploy
-#   image:
-#     name: bitnami/kubectl:latest
-#     entrypoint: ['']
-#   script:
-#     - kubectl config use-context ${KUBE_CONTEXT}
-#     - |
-#       echo "Replace Secret Variables"
-#       (echo "cat <<EOF"; cat k8s/secrets.yaml; echo EOF) | sh > k8s/tmp_secrets.yaml && mv k8s/tmp_secrets.yaml k8s/secrets.yaml
-#     - kubectl apply -f k8s
-#   tags:
-#     - k8s
-#   rules:
-#     - if: '$CI_COMMIT_REF_NAME == "main"'
-#   environment:
-#     name: production
-#     url: https://gotraining.ingmg.com
+Deploy:
+  stage: Deploy
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: ['']
+  script:
+    - kubectl config use-context ${KUBE_CONTEXT}
+    - |
+      echo "Replace Secret Variables"
+      (echo "cat <<EOF"; cat k8s/secrets.yaml; echo EOF) | sh > k8s/tmp_secrets.yaml && mv k8s/tmp_secrets.yaml k8s/secrets.yaml
+    - kubectl apply -f k8s
+
+  tags:
+    - k8s
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+  environment:
+    name: production
+    url: https://go-training.ingmg.com
