@@ -4,7 +4,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: go-webserver
-  namespace: default
+  namespace: go-training
   labels:
     app: go-webserver
 spec:

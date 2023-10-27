@@ -4,6 +4,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: go-webserver
+  namespace: go-training
 spec:
   type: LoadBalancer
   selector:
