@@ -3,7 +3,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: cluster-IMDB
+  name: pg-cluster-imdb
   namespace: go-training
 spec:
   instances: 3
