@@ -22,8 +22,6 @@ Build:
     - echo "${CI_JOB_TOKEN}" | docker login -u ${CI_REGISTRY_USER} ${CI_REGISTRY} --password-stdin
   script:
     - docker build --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:latest .
-    - docker run $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA php --version
-    - docker run $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA ls -lh /var/www/html
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
     - docker push $CI_REGISTRY_IMAGE:latest
   tags:
