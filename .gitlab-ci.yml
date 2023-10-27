@@ -13,17 +13,14 @@ variables:
 Build:
   stage: Build
   image:
-    name: docker:latest
-  services:
-    - docker:dind
-  before_script:
-    - sleep 20
-    - docker info
-    - echo "${CI_JOB_TOKEN}" | docker login -u ${CI_REGISTRY_USER} ${CI_REGISTRY} --password-stdin
+    name: gcr.io/kaniko-project/executor:v1.17.0-debug
+    entrypoint: [""]
   script:
-    - docker build --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:latest .
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    - docker push $CI_REGISTRY_IMAGE:latest
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
+      --destination $CI_REGISTRY_IMAGE:latest
   tags:
    - k8s
   rules:
@@ -51,4 +48,4 @@ Build:
 #     - if: '$CI_COMMIT_REF_NAME == "main"'
 #   environment:
 #     name: production
-#     url: https://gc.telecomunicare.com
+#     url: https://gotraining.ingmg.com
