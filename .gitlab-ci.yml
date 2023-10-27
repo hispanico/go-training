@@ -1,0 +1,56 @@
+---
+
+stages:
+  - Build
+  - Deploy
+
+variables:
+  DOCKER_HOST: tcp://docker:2376
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_TLS_VERIFY: 1
+  DOCKER_CERT_PATH: "${DOCKER_TLS_CERTDIR}/client"
+
+Build:
+  stage: Build
+  image:
+    name: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - sleep 20
+    - docker info
+    - echo "${CI_JOB_TOKEN}" | docker login -u ${CI_REGISTRY_USER} ${CI_REGISTRY} --password-stdin
+  script:
+    - docker build --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY_IMAGE:latest .
+    - docker run $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA php --version
+    - docker run $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA ls -lh /var/www/html
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_IMAGE:latest
+  tags:
+   - k8s
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - Dockerfile
+        - src/**/*
+      when: manual
+      allow_failure: true
+
+# Deploy:
+#   stage: Deploy
+#   image:
+#     name: bitnami/kubectl:latest
+#     entrypoint: ['']
+#   script:
+#     - kubectl config use-context ${KUBE_CONTEXT}
+#     - |
+#       echo "Replace Secret Variables"
+#       (echo "cat <<EOF"; cat k8s/secrets.yaml; echo EOF) | sh > k8s/tmp_secrets.yaml && mv k8s/tmp_secrets.yaml k8s/secrets.yaml
+#     - kubectl apply -f k8s
+#   tags:
+#     - k8s
+#   rules:
+#     - if: '$CI_COMMIT_REF_NAME == "main"'
+#   environment:
+#     name: production
+#     url: https://gc.telecomunicare.com

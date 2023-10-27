@@ -1,0 +1,14 @@
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-webserver
+spec:
+  type: LoadBalancer
+  selector:
+    app: go-webserver
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: go-webserver
