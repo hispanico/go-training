@@ -56,7 +56,6 @@ func main() {
 
 	// Migrate the Book and Review model to the database (create the "book" and review tables)
 	db.AutoMigrate(&Book{}, &Review{})
-	db.Model(&Review{}).AddForeignKey("book_id", "books(id)", "CASCADE", "CASCADE")
 
 	// Create a Gin router
 	router := gin.Default()
