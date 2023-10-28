@@ -86,7 +86,7 @@ func main() {
 		c.JSON(http.StatusOK, reviews)
 	})
 
-	router.GET("/api/book/:id", getBookByID)
+	router.GET("/api/books/:id", getBookByID)
 
 	router.Run() // listen and serve on localhost:8080
 
