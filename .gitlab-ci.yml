@@ -42,7 +42,6 @@ Deploy:
       echo "Replace Secret Variables"
       (echo "cat <<EOF"; cat k8s/secrets.yaml; echo EOF) | sh > k8s/tmp_secrets.yaml && mv k8s/tmp_secrets.yaml k8s/secrets.yaml
     - kubectl apply -f k8s
-
   tags:
     - k8s
   rules:
