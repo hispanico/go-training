@@ -28,8 +28,8 @@ Build:
       changes:
         - Dockerfile
         - src/**/*
-      when: manual
-      allow_failure: true
+      # when: manual
+      # allow_failure: true
 
 Deploy:
   stage: Deploy
