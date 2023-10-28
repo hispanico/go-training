@@ -4,11 +4,11 @@ stages:
   - Build
   - Deploy
 
-variables:
-  DOCKER_HOST: tcp://docker:2376
-  DOCKER_TLS_CERTDIR: "/certs"
-  DOCKER_TLS_VERIFY: 1
-  DOCKER_CERT_PATH: "${DOCKER_TLS_CERTDIR}/client"
+# variables:
+#   DOCKER_HOST: tcp://docker:2376
+#   DOCKER_TLS_CERTDIR: "/certs"
+#   DOCKER_TLS_VERIFY: 1
+#   DOCKER_CERT_PATH: "${DOCKER_TLS_CERTDIR}/client"
 
 Build:
   stage: Build
@@ -19,8 +19,8 @@ Build:
     - /kaniko/executor
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-      --destination $CI_REGISTRY_IMAGE:latest
-      # --destination "${CI_REGISTRY_IMAGE}:${$CI_COMMIT_SHA}"
+      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}"
+      --destination "${CI_REGISTRY_IMAGE}:latest"
   tags:
    - k8s
   rules:
