@@ -44,6 +44,36 @@ spec:
             successThreshold: 1
             failureThreshold: 3
             periodSeconds: 10
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: pg-cluster-imdb-app
+                  key: host
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: pg-cluster-imdb-app
+                  key: user
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pg-cluster-imdb-app
+                  key: password
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: pg-cluster-imdb-app
+                  key: dbname
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: pg-cluster-imdb-app
+                  key: port
+            - name: DB_SSL_MODE
+              value: disable
+            - name: DB_TIMEZONE
+              value: Europe/Amsterdam
           ports:
             - containerPort: 8080
               name: go-webserver
