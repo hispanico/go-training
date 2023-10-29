@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 type Book struct {
@@ -66,30 +67,26 @@ func main() {
 		})
 	})
 
-	router.GET("/api/books", func(c *gin.Context) {
-		var books []Book
-		result := db.Find(&books)
-		if result.Error != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
-			return
-		}
-		c.JSON(http.StatusOK, books)
-	})
-
-	router.GET("/api/reviews", func(c *gin.Context) {
-		var reviews []Review
-		result := db.Find(&reviews)
-		if result.Error != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
-			return
-		}
-		c.JSON(http.StatusOK, reviews)
-	})
+	router.GET("/api/books", getBooks)
 
 	router.GET("/api/books/:id", getBookByID)
 
+	router.GET("/api/books/:id/reviews", getBookReviews)
+
+	router.POST("/api/books/:id/reviews", createReview)
+
 	router.Run() // listen and serve on localhost:8080
 
+}
+
+func getBooks(c *gin.Context) {
+	var books []Book
+	result := db.Find(&books)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, books)
 }
 
 func getBookByID(c *gin.Context) {
@@ -104,4 +101,52 @@ func getBookByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, book)
+}
+
+func getBookReviews(c *gin.Context) {
+	bookId := c.Param("id") // Get the user ID from the URL parameter
+
+	var reviews []Review
+	result := db.Find(&reviews, bookId)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, reviews)
+
+}
+
+func createReview(c *gin.Context) {
+
+	id := c.Param("id") // Get the user ID from the URL parameter
+
+	var review Review
+
+	// Bind JSON request to the input struct
+	if err := c.ShouldBindJSON(&review); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Check if the specified book exists
+	var book Book
+	result := db.First(&book, id)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
+		return
+	}
+
+	// Convert the string to a uint64
+	bookId, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		fmt.Println("Conversion error:", err)
+		return
+	}
+
+	review.BookId = bookId
+
+	// Create a new review
+	db.Create(&review)
+
+	c.JSON(http.StatusCreated, review)
 }
