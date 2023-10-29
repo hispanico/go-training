@@ -107,7 +107,7 @@ func getBookReviews(c *gin.Context) {
 	bookId := c.Param("id") // Get the user ID from the URL parameter
 
 	var reviews []Review
-	result := db.Where("bookId = ?", bookId).Find(&reviews)
+	result := db.Where("book_id = ?", bookId).Find(&reviews)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
