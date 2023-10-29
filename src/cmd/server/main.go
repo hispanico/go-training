@@ -91,21 +91,17 @@ func getBooks(c *gin.Context) {
 
 func getBookByID(c *gin.Context) {
 	id := c.Param("id") // Get the user ID from the URL parameter
-
 	var book Book
 	result := db.First(&book, id)
-
 	if result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
 		return
 	}
-
 	c.JSON(http.StatusOK, book)
 }
 
 func getBookReviews(c *gin.Context) {
 	bookId := c.Param("id") // Get the user ID from the URL parameter
-
 	var reviews []Review
 	result := db.Where("book_id = ?", bookId).Find(&reviews)
 	if result.Error != nil {
@@ -113,21 +109,17 @@ func getBookReviews(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, reviews)
-
 }
 
 func createReview(c *gin.Context) {
 
 	id := c.Param("id") // Get the user ID from the URL parameter
-
 	var review Review
-
 	// Bind JSON request to the input struct
 	if err := c.ShouldBindJSON(&review); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
 	// Check if the specified book exists
 	var book Book
 	result := db.First(&book, id)
@@ -135,18 +127,18 @@ func createReview(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
 		return
 	}
-
 	// Convert the string to a uint64
 	bookId, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
 		fmt.Println("Conversion error:", err)
 		return
 	}
-
 	review.BookId = bookId
-
 	// Create a new review
-	db.Create(&review)
-
+	result = db.Create(&review)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
 	c.JSON(http.StatusCreated, review)
 }
