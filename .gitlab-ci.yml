@@ -43,6 +43,12 @@ Deploy:
     - k8s
   rules:
     - if: '$CI_COMMIT_REF_NAME == "main"'
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      changes:
+        - README.md
+        - .gitlab-ci.yml
+      when: never
+
   environment:
     name: production
     url: $PROD_URL
