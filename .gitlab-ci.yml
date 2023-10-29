@@ -4,12 +4,6 @@ stages:
   - Build
   - Deploy
 
-# variables:
-#   DOCKER_HOST: tcp://docker:2376
-#   DOCKER_TLS_CERTDIR: "/certs"
-#   DOCKER_TLS_VERIFY: 1
-#   DOCKER_CERT_PATH: "${DOCKER_TLS_CERTDIR}/client"
-
 Build:
   stage: Build
   image:
@@ -28,8 +22,6 @@ Build:
       changes:
         - Dockerfile
         - src/**/*
-      # when: manual
-      # allow_failure: true
 
 Deploy:
   stage: Deploy
@@ -41,11 +33,16 @@ Deploy:
     - |
       echo "Replace Secret Variables"
       (echo "cat <<EOF"; cat k8s/secrets.yaml; echo EOF) | sh > k8s/tmp_secrets.yaml && mv k8s/tmp_secrets.yaml k8s/secrets.yaml
-    - kubectl apply -f k8s
+    - |
+      echo "Check ns ${NAMESPACE}..."
+      kubectl get ns ${NAMESPACE} 2> /dev/null || kubectl create ns ${NAMESPACE}
+    - |
+      echo "Deploy on k8s..."
+      kubectl apply -f k8s
   tags:
     - k8s
   rules:
     - if: '$CI_COMMIT_REF_NAME == "main"'
   environment:
     name: production
-    url: https://go-training.ingmg.com
+    url: $PROD_URL
