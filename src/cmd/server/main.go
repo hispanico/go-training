@@ -28,25 +28,58 @@ type Review struct {
 	Comment string `json:"comment"`
 }
 
+type config struct {
+	dbHost     string
+	dbUser     string
+	dbPassword string
+	dbName     string
+	dbPort     string
+	dbSSLMode  string
+	dbTimeZone string
+}
+
+func (c *config) getConfig() {
+	// Load environment variables
+	var ok bool
+	c.dbHost, ok = os.LookupEnv("DB_HOST")
+	if !ok {
+		log.Fatal("Missing DB_HOST")
+	}
+	c.dbUser, ok = os.LookupEnv("DB_USER")
+	if !ok {
+		log.Fatal("Missing DB_USER")
+	}
+	c.dbPassword, ok = os.LookupEnv("DB_PASSWORD")
+	if !ok {
+		log.Fatal("Missing DB_PASSWORD")
+	}
+	c.dbName, ok = os.LookupEnv("DB_NAME")
+	if !ok {
+		log.Fatal("Missing DB_NAME")
+	}
+	c.dbPort, ok = os.LookupEnv("DB_PORT")
+	if !ok {
+		log.Fatal("Missing DB_PORT")
+	}
+	c.dbSSLMode, ok = os.LookupEnv("DB_SSL_MODE")
+	if !ok {
+		log.Fatal("Missing DB_SSL_MODE")
+	}
+	c.dbTimeZone, ok = os.LookupEnv("DB_TIMEZONE")
+	if !ok {
+		c.dbTimeZone = "Europe/Amsterdam"
+	}
+}
+
 var db *gorm.DB
 
 func main() {
-	// Load environment variables
-	dbHost := os.Getenv("DB_HOST") //
-	dbUser := os.Getenv("DB_USER")
-	dbPassword := os.Getenv("DB_PASSWORD")
-	dbName := os.Getenv("DB_NAME")
-	dbPort := os.Getenv("DB_PORT")
-	dbSSLMode := os.Getenv("DB_SSL_MODE")
-	dbTimeZone := os.Getenv("DB_TIMEZONE")
 
-	// Check if any of the environment variables are missing
-	if dbHost == "" || dbUser == "" || dbPassword == "" || dbName == "" || dbPort == "" || dbSSLMode == "" || dbTimeZone == "" {
-		log.Fatal("Missing one or more required environment variables")
-	}
+	dbConfig := config{}
+	dbConfig.getConfig()
 
 	// Create the database connection string
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s", dbHost, dbUser, dbPassword, dbName, dbPort, dbSSLMode, dbTimeZone)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s", dbConfig.dbHost, dbConfig.dbUser, dbConfig.dbPassword, dbConfig.dbName, dbConfig.dbPort, dbConfig.dbSSLMode, dbConfig.dbTimeZone)
 	var err error
 	// Connect to the database
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
