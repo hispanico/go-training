@@ -12,12 +12,13 @@ import (
 )
 
 type Book struct {
-	Id        uint64 `json:"id" gorm:"primaryKey"`
-	Title     string `json:"title"`
-	Isbn      string `json:"isbn"`
-	Language  string `json:"language"`
-	Publisher string `json:"publisher"`
-	NumPages  int64  `json:"numPages"`
+	Id        uint64   `json:"id" gorm:"primaryKey"`
+	Title     string   `json:"title"`
+	Isbn      string   `json:"isbn"`
+	Language  string   `json:"language"`
+	Publisher string   `json:"publisher"`
+	NumPages  int64    `json:"numPages"`
+	Reviews   []Review `json:"omitempty"`
 }
 
 type Review struct {
@@ -25,7 +26,7 @@ type Review struct {
 	BookId  uint64 `json:"bookId"`
 	Rating  int64  `json:"rating"`
 	Comment string `json:"comment"`
-	Book    Book   `json:"-" gorm:"foreignKey:BookId"` // Foreign key reference
+	// Book    Book   `json:"-" gorm:"foreignKey:BookId"` // Foreign key reference
 }
 
 var db *gorm.DB
