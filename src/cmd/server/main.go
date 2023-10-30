@@ -114,7 +114,7 @@ func getBookReviews(c *gin.Context) {
 
 func createReview(c *gin.Context) {
 
-	id := c.Param("id") // Get the user ID from the URL parameter
+	bookId := c.Param("id") // Get the user ID from the URL parameter
 	var review Review
 	// Bind JSON request to the input struct
 	if err := c.ShouldBindJSON(&review); err != nil {
@@ -123,18 +123,19 @@ func createReview(c *gin.Context) {
 	}
 	// Check if the specified book exists
 	var book Book
-	result := db.First(&book, id)
+	result := db.First(&book, bookId)
 	if result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
 		return
 	}
 	// Convert the string to a uint64
-	bookId, err := strconv.ParseUint(id, 10, 64)
+	bookIdUint, err := strconv.ParseUint(bookId, 10, 64)
 	if err != nil {
 		fmt.Println("Conversion error:", err)
 		return
 	}
-	review.BookId = bookId
+	review.BookId = bookIdUint
+	review.Id = 0
 	// Create a new review
 	result = db.Create(&review)
 	if result.Error != nil {
