@@ -26,7 +26,6 @@ type Review struct {
 	BookId  uint64 `json:"bookId"`
 	Rating  int64  `json:"rating"`
 	Comment string `json:"comment"`
-	// Book    Book   `json:"-" gorm:"foreignKey:BookId"` // Foreign key reference
 }
 
 var db *gorm.DB
@@ -93,7 +92,7 @@ func getBooks(c *gin.Context) {
 func getBookByID(c *gin.Context) {
 	id := c.Param("id") // Get the user ID from the URL parameter
 	var book Book
-	result := db.First(&book, id)
+	result := db.Preload("Reviews").First(&book, id)
 	if result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
 		return
