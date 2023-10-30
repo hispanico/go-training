@@ -18,7 +18,7 @@ type Book struct {
 	Language  string   `json:"language"`
 	Publisher string   `json:"publisher"`
 	NumPages  int64    `json:"numPages"`
-	Reviews   []Review `json:"omitempty"`
+	Reviews   []Review `json:"reviews,omitempty"`
 }
 
 type Review struct {
